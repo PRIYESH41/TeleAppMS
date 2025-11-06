@@ -1,7 +1,5 @@
 package com.example.teleapp.customer.dto;
 
-import com.example.teleapp.customer.entity.Plan;
-
 public class PlanDTO {
 
 	
@@ -41,15 +39,6 @@ public class PlanDTO {
 		super();
 	}
 
-	// Converts Entity into DTO
-	public static PlanDTO valueOf(Plan plan) {
-		PlanDTO planDTO= new PlanDTO();
-		planDTO.setLocalRate(plan.getLocalRate());
-		planDTO.setNationalRate(plan.getNationalRate());
-		planDTO.setPlanId(plan.getPlanId());
-		planDTO.setPlanName(plan.getPlanName());
-		return planDTO;
-	}
 	@Override
 	public String toString() {
 		return "PlanDTO [planId=" + planId + ", planName=" + planName + ", nationalRate=" + nationalRate

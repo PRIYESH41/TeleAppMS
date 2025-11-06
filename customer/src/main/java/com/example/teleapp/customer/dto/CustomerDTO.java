@@ -1,10 +1,8 @@
 package com.example.teleapp.customer.dto;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.example.teleapp.customer.entity.Customer;
-import com.example.teleapp.customer.entity.FriendFamily;
 
 public class CustomerDTO {
 
@@ -100,15 +98,11 @@ public class CustomerDTO {
 			custDTO.setName(cust.getName());
 			custDTO.setPhoneNo(cust.getPhoneNo());
 			custDTO.setAddress(cust.getAddress());
-			PlanDTO planDTO = PlanDTO.valueOf(cust.getPlan());
+			custDTO.setPassword(cust.getPassword());
+			PlanDTO planDTO = new PlanDTO();
+			planDTO.setPlanId(cust.getPlanId());
 			custDTO.setCurrentPlan(planDTO);
-			
-			List<FriendFamily> friends = cust.getFriends();
-			List<Long> friendList = new ArrayList<>();
-			for (FriendFamily friend : friends) {
-				friendList.add(friend.getFriendAndFamily());
-			}
-			custDTO.setFriendAndFamily(friendList);
+			custDTO.setCurrentPlan(planDTO);
 			
 			return custDTO;
 		}
@@ -122,6 +116,7 @@ public class CustomerDTO {
 			cust.setPhoneNo(this.getPhoneNo());
 			cust.setAddress(this.getAddress());
 			cust.setPassword(this.getPassword());
+			cust.setPlanId(this.getCurrentPlan().getPlanId());
 			
 			return cust;
 		}

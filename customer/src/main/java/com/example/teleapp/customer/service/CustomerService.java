@@ -1,14 +1,18 @@
 package com.example.teleapp.customer.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import com.example.teleapp.customer.dto.CustomerDTO;
 import com.example.teleapp.customer.dto.LoginDTO;
+import com.example.teleapp.customer.dto.PlanDTO;
 import com.example.teleapp.customer.entity.Customer;
 import com.example.teleapp.customer.repository.CustomerRepository;
 
@@ -18,6 +22,13 @@ public class CustomerService {
 
 	@Autowired
 	CustomerRepository custRepo;
+	
+	
+	@Value("${friend.uri}")
+	String friendUri;
+
+	@Value("${plan.uri}")
+	String planUri;
 
 	public void createCustomer(CustomerDTO custDTO) {
 		LOGGER.info("Creation request for customer "+ custDTO);
@@ -51,6 +62,15 @@ public class CustomerService {
 		if (optCust.isPresent()) {
 			Customer cust = optCust.get();
 			custDTO = CustomerDTO.valueOf(cust);
+			
+			LOGGER.info("Fetching Plan detail remote call");
+			PlanDTO planDTO=new RestTemplate().getForObject(planUri+custDTO.getCurrentPlan().getPlanId(), PlanDTO.class);
+			custDTO.setCurrentPlan(planDTO);
+			
+			LOGGER.info("Fetching friends and family number remote call");
+			List<Long> friends=new RestTemplate().getForObject(friendUri+phoneNo+"/friends", List.class);
+			custDTO.setFriendAndFamily(friends);
+			
 		}
 
 		LOGGER.info("Profile for customer : "+ custDTO);

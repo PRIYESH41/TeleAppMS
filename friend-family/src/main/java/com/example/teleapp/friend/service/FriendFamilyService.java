@@ -1,5 +1,8 @@
 package com.example.teleapp.friend.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +27,19 @@ public class FriendFamilyService {
 		friendDTO.setPhoneNo(phoneNo);
 		FriendFamily friend = friendDTO.createFriend();
 		friendRepo.save(friend);
+	}
+	
+	
+	// Get friend and family phone number list of a given customer
+	public List<Long> getSpecificFriends(Long phoneNo){
+		LOGGER.info("Friend and family detailsfor customer "+ phoneNo);
+		List<Long> friendList= new ArrayList<>();
+		List<FriendFamily> friends=friendRepo.findByPhoneNo(phoneNo);
+		for (FriendFamily friendFamily : friends) {
+			friendList.add(friendFamily.getFriendAndFamily());
+		}
+		LOGGER.info("The friend list is for customer"+phoneNo+" is "+friendList);
+		return friendList;
 	}
 
 }

@@ -1,15 +1,8 @@
 package com.example.teleapp.customer.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 
 
 @Entity
@@ -28,30 +21,16 @@ public class Customer {
 	String password;
 	@Column(nullable = false, length = 1)
 	char gender;
-	
-	@OneToOne(cascade=CascadeType.REFRESH)
-	@JoinColumn(name="plan_id")
-	Plan plan;
+	@Column(name = "plan_id",nullable = false)
+	Integer planId;
 
-	@OneToMany(cascade=CascadeType.MERGE)
-	@JoinColumn(name="phone_no")
-	List<FriendFamily> friends=new ArrayList<>();
-	
-	
-	public Plan getPlan() {
-		return plan;
+
+	public Integer getPlanId() {
+		return planId;
 	}
 
-	public void setPlan(Plan plan) {
-		this.plan = plan;
-	}
-
-	public List<FriendFamily> getFriends() {
-		return friends;
-	}
-
-	public void setFriends(List<FriendFamily> friends) {
-		this.friends = friends;
+	public void setPlanId(Integer planId) {
+		this.planId = planId;
 	}
 
 	public char getGender() {
