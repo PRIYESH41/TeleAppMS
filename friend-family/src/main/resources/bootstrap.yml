@@ -1,11 +1,13 @@
 server:
-  port: 9300
+  port: 9500
   
 spring:
   application:
     name: FriendMS
   cloud:
     consul:
+      discovery:
+        hostname: localhost
       config:
         fail-fast: false
         enabled: true

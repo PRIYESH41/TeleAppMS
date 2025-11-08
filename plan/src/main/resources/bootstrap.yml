@@ -6,6 +6,8 @@ spring:
     name: PlanMS
   cloud:
     consul:
+      discovery:
+        hostname: localhost
       config:
         fail-fast: false
         enabled: true
