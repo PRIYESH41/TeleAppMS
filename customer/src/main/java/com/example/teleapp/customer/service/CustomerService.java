@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Service;
@@ -19,6 +18,7 @@ import com.example.teleapp.customer.entity.Customer;
 import com.example.teleapp.customer.repository.CustomerRepository;
 
 @Service
+//@LoadBalancerClient(name = "friend-ms",configuration=LoadBalancerConfig.class)
 public class CustomerService {
 	private static final Log LOGGER = LogFactory.getLog(CustomerService.class);
 
@@ -28,6 +28,9 @@ public class CustomerService {
 	@Autowired
 	DiscoveryClient discoveryClient;
 
+	@Autowired
+	RestTemplate restTemplate;
+	
 	public void createCustomer(CustomerDTO custDTO) {
 		LOGGER.info("Creation request for customer "+ custDTO);
 		Customer cust = custDTO.createEntity();
@@ -67,10 +70,11 @@ public class CustomerService {
 			PlanDTO planDTO=new RestTemplate().getForObject(planUri+"/plans/"+custDTO.getCurrentPlan().getPlanId(), PlanDTO.class);
 			custDTO.setCurrentPlan(planDTO);
 			
-			LOGGER.info("Fetching friends and family number remote call");
-			String friendUri = getUriFromDiscoveryClient("FriendMS");
+			//LOGGER.info("Fetching friends and family number remote call");
+			//String friendUri = getUriFromDiscoveryClient("FriendMS");
 			
-			List<Long> friends=new RestTemplate().getForObject(friendUri+"/customers/"+phoneNo+"/friends", List.class);
+			//List<Long> friends=new RestTemplate().getForObject(friendUri+"/customers/"+phoneNo+"/friends", List.class);
+			List<Long> friends=restTemplate.getForObject("http://FriendMS/customers/"+phoneNo+"/friends", List.class);
 			custDTO.setFriendAndFamily(friends);
 			
 		}

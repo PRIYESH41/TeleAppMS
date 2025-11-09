@@ -75,6 +75,13 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-consul-discovery</artifactId>
 		</dependency>
+
+		<dependency>
+		<!--  This is also comes in spring-cloud-starter-consul-discovery dependency -->  
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-loadbalancer</artifactId>
+		</dependency>
+		
 		
 	</dependencies>
 
