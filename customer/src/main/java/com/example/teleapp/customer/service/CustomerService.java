@@ -17,6 +17,8 @@ import com.example.teleapp.customer.dto.PlanDTO;
 import com.example.teleapp.customer.entity.Customer;
 import com.example.teleapp.customer.repository.CustomerRepository;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
 @Service
 //@LoadBalancerClient(name = "friend-ms",configuration=LoadBalancerConfig.class)
 public class CustomerService {
@@ -55,6 +57,7 @@ public class CustomerService {
 
 	// Fetches full profile of a specific customer
 
+	@CircuitBreaker(name = "customerService" , fallbackMethod = "getCustomerProfileFallback")
 	public CustomerDTO getCustomerProfile(Long phoneNo) {
 
 		CustomerDTO custDTO = null;
@@ -92,6 +95,11 @@ public class CustomerService {
 			  uri = serviceInstances.get(0).getUri().toString();
 		  }	
 		  return uri;
+	}
+	
+	public CustomerDTO getCustomerProfileFallback(Long phoneNo,Throwable throwable) {
+		LOGGER.info("***************IN FALLBACK********************");
+		return new CustomerDTO();
 	}
 
 }
