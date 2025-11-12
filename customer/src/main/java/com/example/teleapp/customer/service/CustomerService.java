@@ -9,15 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import com.example.teleapp.customer.dto.CustomerDTO;
 import com.example.teleapp.customer.dto.LoginDTO;
 import com.example.teleapp.customer.dto.PlanDTO;
 import com.example.teleapp.customer.entity.Customer;
 import com.example.teleapp.customer.repository.CustomerRepository;
-
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
 @Service
 //@LoadBalancerClient(name = "friend-ms",configuration=LoadBalancerConfig.class)
@@ -29,9 +26,9 @@ public class CustomerService {
 	
 	@Autowired
 	DiscoveryClient discoveryClient;
-
+	
 	@Autowired
-	RestTemplate restTemplate;
+	RemoteCallService remoteCallService;
 	
 	public void createCustomer(CustomerDTO custDTO) {
 		LOGGER.info("Creation request for customer "+ custDTO);
@@ -56,29 +53,34 @@ public class CustomerService {
 	}
 
 	// Fetches full profile of a specific customer
-
-	@CircuitBreaker(name = "customerService" , fallbackMethod = "getCustomerProfileFallback")
 	public CustomerDTO getCustomerProfile(Long phoneNo) {
-
+		long overAllStart = System.currentTimeMillis();
 		CustomerDTO custDTO = null;
 		LOGGER.info("Profile request for customer "+ phoneNo);
 		Optional<Customer> optCust = custRepo.findById(phoneNo);
+		
 		if (optCust.isPresent()) {
 			Customer cust = optCust.get();
 			custDTO = CustomerDTO.valueOf(cust);
 			
-			LOGGER.info("Fetching Plan detail remote call");
-			String planUri = getUriFromDiscoveryClient("PlanMS");
+			//String planUri = getUriFromDiscoveryClient("PlanMS");			
 			
-			PlanDTO planDTO=new RestTemplate().getForObject(planUri+"/plans/"+custDTO.getCurrentPlan().getPlanId(), PlanDTO.class);
+			LOGGER.info("Fetching Plan detail remote call");
+			long planStart = System.currentTimeMillis();
+			PlanDTO planDTO = remoteCallService.getSpecificPlan(custDTO.getCurrentPlan().getPlanId());
+			long planStop = System.currentTimeMillis();
 			custDTO.setCurrentPlan(planDTO);
 			
-			//LOGGER.info("Fetching friends and family number remote call");
-			//String friendUri = getUriFromDiscoveryClient("FriendMS");
-			
-			//List<Long> friends=new RestTemplate().getForObject(friendUri+"/customers/"+phoneNo+"/friends", List.class);
-			List<Long> friends=restTemplate.getForObject("http://FriendMS/customers/"+phoneNo+"/friends", List.class);
+			LOGGER.info("Fetching friends and family number remote call");
+			long friendStart = System.currentTimeMillis();
+			List<Long> friends=remoteCallService.getSpecificFriends(phoneNo);
+			long friendStop = System.currentTimeMillis();
 			custDTO.setFriendAndFamily(friends);
+			
+			long overAllStop = System.currentTimeMillis();
+			LOGGER.info("Total time for Plan "+(planStop-planStart));
+			LOGGER.info("Total time for Friend "+(friendStop-friendStart));
+			LOGGER.info("Total Overall time for Request "+(overAllStop-overAllStart));
 			
 		}
 

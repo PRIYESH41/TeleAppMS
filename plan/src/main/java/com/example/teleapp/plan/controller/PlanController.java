@@ -30,6 +30,11 @@ public class PlanController {
 	// To get a plan details based on plan id
 	@GetMapping(value = "/plans/{planId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public PlanDTO getPlan(@PathVariable("planId") Integer planId) {
+		try {
+		    Thread.sleep(5000);
+		}catch(InterruptedException e) {
+			e.printStackTrace();
+		}
 		return planService.getPlan(planId);
 	}
 
