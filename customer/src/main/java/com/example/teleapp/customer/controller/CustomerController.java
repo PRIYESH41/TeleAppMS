@@ -1,5 +1,7 @@
 package com.example.teleapp.customer.controller;
 
+import java.util.concurrent.ExecutionException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +42,7 @@ public class CustomerController {
 
 	// Fetches full profile of a specific customer
 	@GetMapping(value = "/customers/{phoneNo}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public CustomerDTO getCustomerProfile(@PathVariable Long phoneNo) {
+	public CustomerDTO getCustomerProfile(@PathVariable Long phoneNo) throws InterruptedException, ExecutionException {
 
 		LOGGER.info("Profile request for customer "+ phoneNo);
 		return custService.getCustomerProfile(phoneNo);

@@ -2,6 +2,8 @@ package com.example.teleapp.customer.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,7 +55,7 @@ public class CustomerService {
 	}
 
 	// Fetches full profile of a specific customer
-	public CustomerDTO getCustomerProfile(Long phoneNo) {
+	public CustomerDTO getCustomerProfile(Long phoneNo) throws InterruptedException, ExecutionException  {
 		long overAllStart = System.currentTimeMillis();
 		CustomerDTO custDTO = null;
 		LOGGER.info("Profile request for customer "+ phoneNo);
@@ -67,16 +69,17 @@ public class CustomerService {
 			
 			LOGGER.info("Fetching Plan detail remote call");
 			long planStart = System.currentTimeMillis();
-			PlanDTO planDTO = remoteCallService.getSpecificPlan(custDTO.getCurrentPlan().getPlanId());
+			Future<PlanDTO> planDTOFuture = remoteCallService.getSpecificPlan(custDTO.getCurrentPlan().getPlanId());
 			long planStop = System.currentTimeMillis();
-			custDTO.setCurrentPlan(planDTO);
 			
 			LOGGER.info("Fetching friends and family number remote call");
 			long friendStart = System.currentTimeMillis();
-			List<Long> friends=remoteCallService.getSpecificFriends(phoneNo);
+			Future<List<Long>> friendsFuture =remoteCallService.getSpecificFriends(phoneNo);
 			long friendStop = System.currentTimeMillis();
-			custDTO.setFriendAndFamily(friends);
+
 			
+			custDTO.setCurrentPlan(planDTOFuture.get());
+			custDTO.setFriendAndFamily(friendsFuture.get());			
 			long overAllStop = System.currentTimeMillis();
 			LOGGER.info("Total time for Plan "+(planStop-planStart));
 			LOGGER.info("Total time for Friend "+(friendStop-friendStart));
