@@ -19,17 +19,23 @@ public class RemoteCallService {
 	
 	private static final Log LOGGER = LogFactory.getLog(RemoteCallService.class);
 
+//	@Autowired
+//	RestTemplate restTemplate;
+	
 	@Autowired
-	RestTemplate restTemplate;
+	FriendFeignService friendFeignService;
+	
+	@Autowired
+	PlanFeignService planFeignService;
 	
 	@CircuitBreaker(name = "customerService" , fallbackMethod = "getFriendsFallback")
 	public Future<List<Long>> getSpecificFriends(Long phoneNo) {
-		return CompletableFuture.supplyAsync(()->restTemplate.getForObject("http://FriendMS/customers/"+phoneNo+"/friends", List.class));
+		return CompletableFuture.supplyAsync(()->friendFeignService.getSpecificFriends(phoneNo));
 	}
 	
 	@CircuitBreaker(name = "customerService" , fallbackMethod = "getPlanFallback")
 	public Future<PlanDTO> getSpecificPlan(Integer planId) {
-		return CompletableFuture.supplyAsync(()->restTemplate.getForObject("http://PlanMS/plans/"+planId, PlanDTO.class));
+		return CompletableFuture.supplyAsync(()->planFeignService.getPlan(planId));
 	}
 		
 	
